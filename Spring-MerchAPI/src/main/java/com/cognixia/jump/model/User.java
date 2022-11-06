@@ -41,8 +41,8 @@ public class User implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Role role;
 	
-	
-//	private boolean enabled;
+	@Column(columnDefinition = "boolean default true")
+	private boolean enabled;
 	
 	
 	
@@ -57,13 +57,14 @@ public class User implements Serializable {
 
 	
 	//only really needs when we set up manually (testing, etc)
-	public User(Long user_id, String username, String password, String email, Role role) {
+	public User(Long user_id, String username, String password, String email, Role role, boolean enabled) {
 		super();
 		this.user_id = user_id;
 		this.username = username;
 		this.password = password;
 		this.email = email;
 		this.role = role;
+		this.enabled = enabled;
 	}
 
 
@@ -150,10 +151,26 @@ public class User implements Serializable {
 
 
 
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+
+
+
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+
+
+
+
 	@Override
 	public String toString() {
 		return "User [user_id=" + user_id + ", username=" + username + ", password=" + password + ", email=" + email
-				+ ", role=" + role + "]";
+				+ ", role=" + role + ", enabled=" + enabled + "]";
 	}
 	
 	
