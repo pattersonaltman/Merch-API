@@ -51,8 +51,8 @@ public class SecurityConfiguration {
 		
 		http.csrf().disable()
 		.authorizeRequests()
-		.antMatchers(HttpMethod.POST, "/api/user").permitAll()
-		.antMatchers("/authenticate").permitAll()	// anyone can create  JWT w/o needing to have a JWT first
+		.antMatchers(HttpMethod.POST, "/api/user/create").permitAll()	// anyone can create a User account at this endpoint
+		.antMatchers("/api/authenticate").permitAll()	// anyone can create  JWT w/o needing to have a JWT first
 		.anyRequest().authenticated()	// all APIs, you have to have a user account
 		.and()
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);	// tell spring security to NOT create sessions
