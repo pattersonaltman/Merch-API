@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,7 +52,7 @@ public class UserController {
 		
 		if(userRepo.existsById(user.getUser_id()))
 		{
-			return ResponseEntity.status(400).body("User with id: [" + user.getUser_id() + "] already exists");
+			return ResponseEntity.status(400).body("User with id: " + user.getUser_id() + " already exists");
 		}
 		
 		user.setUser_id(null);	// might be trashable since id = null is not accepted [?]
@@ -96,13 +97,32 @@ public class UserController {
 	
 	
 	
+	
+	
 	// Update user by id
-		/*
-		 * Potential Conflicts:
-		 * 	- 
-		 */
 	@PutMapping("/user/update")
-	public ResponseEntity<?> updateUser(@RequestBody UpdateUserModel model) {
+	public ResponseEntity<?> updateUser(@RequestBody User user) {
+		
+		
+		if(userRepo.existsById(user.getUser_id()))
+		{
+			user.setPassword(encoder.encode(user.getPassword()));	//re-encode password
+			
+			User updated = userRepo.save(user);
+			
+			return ResponseEntity.status(200).body(updated);
+		}
+		
+		return ResponseEntity.status(400).body("User with id: " + user.getUser_id() + " does not exist");
+	}
+	
+	
+	
+	
+	
+	// Update user by id - without updating id, with request model
+	@PutMapping("/user/update/rqmodel")
+	public ResponseEntity<?> updateUserRequestModel(@RequestBody UpdateUserModel model) {
 		
 		if(userServ.updateUserById(model))
 		{
@@ -117,6 +137,20 @@ public class UserController {
 	
 	
 	// Delete
+	@DeleteMapping("/user/delete/{id}")
+	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+		
+		if(userRepo.existsById(id))
+		{
+			User deleted = userRepo.findById(id).get();
+			
+			userRepo.deleteById(id);
+			
+			return ResponseEntity.status(200).body(deleted);
+		}
+		
+		return ResponseEntity.status(400).body("User with id: " + id + " does not exist");
+	}
 	
 	
 	

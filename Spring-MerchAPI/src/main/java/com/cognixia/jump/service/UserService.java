@@ -32,10 +32,6 @@ public class UserService {
 	 * 
 	 * Notes:
 	 * 	- all fields except user_id are able to passed in and updated through the UpdateUserModel
-	 * 
-	 * Constraints:
-	 * 	- Changing password gets rid of the password encryption and turns to plain text
-	 * 		How to make it so that: the password changes AND gets encrypted?
 	 */
 	public boolean updateUserById(UpdateUserModel model) {
 		
