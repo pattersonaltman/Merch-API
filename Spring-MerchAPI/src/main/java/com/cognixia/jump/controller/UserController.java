@@ -3,6 +3,8 @@ package com.cognixia.jump.controller;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognixia.jump.exception.ResourceAlreadyExistsException;
+import com.cognixia.jump.exception.ResourceNotFoundException;
 import com.cognixia.jump.model.UpdateUserModel;
 import com.cognixia.jump.model.User;
 import com.cognixia.jump.repository.UserRepository;
@@ -47,12 +51,11 @@ public class UserController {
 	
 	// Create a User (Authorizations: Anyone)
 	@PostMapping("/user/create")
-	public ResponseEntity<?> createUser(@RequestBody User user) {
-		
+	public ResponseEntity<?> createUser(@Valid @RequestBody User user) throws ResourceAlreadyExistsException {
 		
 		if(userRepo.existsById(user.getUser_id()))
 		{
-			return ResponseEntity.status(400).body("User with id: " + user.getUser_id() + " already exists");
+			throw new ResourceAlreadyExistsException("User", user.getUser_id());
 		}
 		
 		user.setUser_id(null);	// might be trashable since id = null is not accepted [?]
@@ -82,8 +85,16 @@ public class UserController {
 	
 	// Get user by id
 	@GetMapping("/user/id/{id}")
-	public Optional<User> getById(@PathVariable Long id) {
-		return userRepo.findById(id);
+	public Optional<User> getById(@PathVariable Long id) throws ResourceNotFoundException {
+		
+		Optional<User> found = userRepo.findById(id);
+		
+		if(found.isPresent())
+		{
+			return found;
+		}
+		
+		throw new ResourceNotFoundException("User", id);
 	}
 	
 	
@@ -91,8 +102,16 @@ public class UserController {
 	
 	// Get user by username
 	@GetMapping("/user/username/{username}")
-	public Optional<User> getByUsername(@PathVariable String username) {	
-		return userRepo.findByUsername(username);
+	public Optional<User> getByUsername(@PathVariable String username) throws ResourceNotFoundException {	
+		
+		Optional<User> found = userRepo.findByUsername(username);
+		
+		if(found.isPresent())
+		{
+			return found;
+		}
+		
+		throw new ResourceNotFoundException("User", username);
 	}
 	
 	
@@ -101,7 +120,7 @@ public class UserController {
 	
 	// Update user by id
 	@PutMapping("/user/update")
-	public ResponseEntity<?> updateUser(@RequestBody User user) {
+	public ResponseEntity<?> updateUser(@RequestBody User user) throws ResourceNotFoundException {
 		
 		
 		if(userRepo.existsById(user.getUser_id()))
@@ -113,7 +132,7 @@ public class UserController {
 			return ResponseEntity.status(200).body(updated);
 		}
 		
-		return ResponseEntity.status(400).body("User with id: " + user.getUser_id() + " does not exist");
+		throw new ResourceNotFoundException("User", user.getUser_id());
 	}
 	
 	
@@ -122,14 +141,14 @@ public class UserController {
 	
 	// Update user by id - without updating id, with request model
 	@PutMapping("/user/update/rqmodel")
-	public ResponseEntity<?> updateUserRequestModel(@RequestBody UpdateUserModel model) {
+	public ResponseEntity<?> updateUserRequestModel(@RequestBody UpdateUserModel model) throws ResourceNotFoundException {
 		
 		if(userServ.updateUserById(model))
 		{
 			return ResponseEntity.status(200).body(userRepo.findById(model.getIdToModify()));
 		}
 		
-		return ResponseEntity.status(400).body("User with id [" + model.getIdToModify() + "] does not exist");
+		throw new ResourceNotFoundException("User", model.getIdToModify());
 	}
 	
 	
@@ -138,7 +157,7 @@ public class UserController {
 	
 	// Delete
 	@DeleteMapping("/user/delete/{id}")
-	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+	public ResponseEntity<?> deleteUser(@PathVariable Long id) throws ResourceNotFoundException {
 		
 		if(userRepo.existsById(id))
 		{
@@ -149,7 +168,7 @@ public class UserController {
 			return ResponseEntity.status(200).body(deleted);
 		}
 		
-		return ResponseEntity.status(400).body("User with id: " + id + " does not exist");
+		throw new ResourceNotFoundException("User", id);
 	}
 	
 	

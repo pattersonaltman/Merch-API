@@ -1,7 +1,10 @@
 package com.cognixia.jump.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,7 +12,20 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+// http://localhost:8080/swagger-ui/index.html
+// http://localhost:8080/openapi.html
+
+@Schema(description = "User")
 @Entity
 public class User implements Serializable {
 
@@ -35,6 +51,7 @@ public class User implements Serializable {
 	@Column(nullable = false)
 	private String password;
 	
+	@NotBlank(message = "Email must not be blank")
 	@Column(nullable = false)
 	private String email;
 	
@@ -43,6 +60,15 @@ public class User implements Serializable {
 	
 	@Column(columnDefinition = "boolean default true")
 	private boolean enabled;
+	
+	@JsonIgnoreProperties("users")
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinTable(
+			name = "User_Hoodie",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "hoodie_id")
+			)
+	private Set<Hoodie> hoodies = new HashSet<>();
 	
 	
 	

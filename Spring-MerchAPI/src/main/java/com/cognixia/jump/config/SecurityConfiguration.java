@@ -53,6 +53,14 @@ public class SecurityConfiguration {
 		.authorizeRequests()
 		.antMatchers(HttpMethod.POST, "/api/user/create").permitAll()	// anyone can create a User account at this endpoint
 		.antMatchers("/api/authenticate").permitAll()	// anyone can create  JWT w/o needing to have a JWT first
+		.antMatchers("/openapi.html").permitAll()	//OpenApi	
+		.antMatchers(HttpMethod.PUT, "/api/user/update").hasRole("ADMIN")
+		.antMatchers(HttpMethod.GET, "/api/user").hasRole("ADMIN")
+		.antMatchers(HttpMethod.GET, "/api/user/id/{id}").hasRole("ADMIN")
+		.antMatchers(HttpMethod.GET, "/api/user/username/{username}").hasRole("ADMIN")
+		.antMatchers(HttpMethod.DELETE, "/api/user/delete/{id}").hasRole("ADMIN")
+		.antMatchers(HttpMethod.POST, "/api/hoodie/cart").hasRole("USER")
+		
 		.anyRequest().authenticated()	// all APIs, you have to have a user account
 		.and()
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);	// tell spring security to NOT create sessions

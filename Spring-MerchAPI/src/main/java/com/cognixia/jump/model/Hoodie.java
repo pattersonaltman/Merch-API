@@ -1,6 +1,8 @@
 package com.cognixia.jump.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +11,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Hoodie implements Serializable {
@@ -20,18 +25,18 @@ public class Hoodie implements Serializable {
 	//Set up Enums for: size, color, material
 	
 	public static enum Size {
-		SMALL, MEDIUM, LARGE
+		SMALL, MEDIUM, LARGE, XXXL
 	}
 	
 	
 	public static enum Color {
 		RED, BLUE, GREEN, ORANGE,
-		YELLOW, PURPLE, BLACK, WHITE
+		YELLOW, PURPLE, BLACK, WHITE, RAINBOW
 	}
 	
 	
 	public static enum Material {
-		FLEECE, COTTON, WOOL, VELVET, DENIM, NYLON
+		FLEECE, COTTON, WOOL, VELVET, DENIM, NYLON, CHINCHILLA
 	}
 	
 	
@@ -54,6 +59,10 @@ public class Hoodie implements Serializable {
 	
 	@Column(nullable = false)
 	private int qty;
+	
+	@JsonIgnoreProperties("hoodies")
+	@ManyToMany(mappedBy = "hoodies")
+	private Set<User> users = new HashSet<>();
 	
 	
 	
