@@ -1,0 +1,10 @@
+
+
+{
+    "user_id": 0,
+    "username": "user1",
+    "password": "pass1",
+    "email": "email1@gmail.com",
+    "role": "ROLE_USER",
+    "enabled": 1
+}
